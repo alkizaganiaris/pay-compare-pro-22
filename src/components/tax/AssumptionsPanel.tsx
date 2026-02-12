@@ -1,57 +1,17 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ukTaxConfig, spainNormalConfig, spainBeckhamConfig, spainAutonomoConfig } from '@/data/taxConfig';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { ukTaxConfig, spainNormalConfig, spainBeckhamConfig, spainAutonomoConfig, SMI_MONTHLY } from '@/data/taxConfig';
 import { TaxInputs } from '@/types/tax';
 
 interface AssumptionsPanelProps {
   inputs: TaxInputs;
+  taxYear: string;
   taxYears: { uk: string; spainNormal: string; spainBeckham: string; spainAutonomo: string };
-  onTaxYearsChange: (years: { uk: string; spainNormal: string; spainBeckham: string; spainAutonomo: string }) => void;
 }
 
-export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }: AssumptionsPanelProps) {
+export default function AssumptionsPanel({ inputs, taxYear, taxYears }: AssumptionsPanelProps) {
   return (
     <div className="space-y-6">
-      {/* Tax Year Selectors */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div>
-          <Label className="text-xs">UK Tax Year</Label>
-          <Select value={taxYears.uk} onValueChange={(v) => onTaxYearsChange({ ...taxYears, uk: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Object.keys(ukTaxConfig).map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs">Spain Normal Year</Label>
-          <Select value={taxYears.spainNormal} onValueChange={(v) => onTaxYearsChange({ ...taxYears, spainNormal: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Object.keys(spainNormalConfig).map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs">Beckham Year</Label>
-          <Select value={taxYears.spainBeckham} onValueChange={(v) => onTaxYearsChange({ ...taxYears, spainBeckham: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Object.keys(spainBeckhamConfig).map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs">Autónomo Year</Label>
-          <Select value={taxYears.spainAutonomo} onValueChange={(v) => onTaxYearsChange({ ...taxYears, spainAutonomo: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Object.keys(spainAutonomoConfig).map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <p className="text-sm font-medium">Tax year <strong>{taxYear}</strong> applied across all scenarios (UK: {taxYears.uk}, Spain: {taxYear})</p>
 
       {/* Per-regime accordions */}
       <Accordion type="multiple" className="w-full">
@@ -76,7 +36,7 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
                   <li>2% on earnings above £{ukTaxConfig[taxYears.uk].niThresholds?.upper.toLocaleString()}</li>
                 </ul>
               )}
-              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled && inputs.ukResident ? 'Included — estimated at basic rate (20%) on net rental income' : 'Not included'}</p>
+              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled ? (inputs.foreignPropertyCountry === 'UK' ? 'Included — S24 applies for UK properties (20% credit on mortgage interest)' : 'Included — taxed at marginal rate') : 'Not included'}</p>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -85,10 +45,11 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
           <AccordionTrigger className="text-sm">🇪🇸 Spain Normal (Employed)</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2 text-sm text-muted-foreground">
+              <p><strong>Region:</strong> Barcelona (Catalonia) assumed</p>
               <p><strong>Tax year:</strong> {taxYears.spainNormal}</p>
               <p><strong>Personal minimum:</strong> €{spainNormalConfig[taxYears.spainNormal].personalMinimum?.toLocaleString()}</p>
               <p><strong>General deduction:</strong> €{spainNormalConfig[taxYears.spainNormal].generalDeduction?.toLocaleString()}</p>
-              <p><strong>IRPF bands (state + average regional):</strong></p>
+              <p><strong>IRPF bands (Barcelona / Catalonia):</strong></p>
               <ul className="list-disc ml-4">
                 {spainNormalConfig[taxYears.spainNormal].bands.map((b, i) => (
                   <li key={i}>
@@ -97,7 +58,7 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
                 ))}
               </ul>
               <p><strong>Employee social security:</strong> {(spainNormalConfig[taxYears.spainNormal].socialSecurityRate! * 100).toFixed(2)}% capped at €{spainNormalConfig[taxYears.spainNormal].socialSecurityCap?.toLocaleString()}/year</p>
-              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled && inputs.spainResident && inputs.treatAsForeignSource ? 'Included in worldwide income' : 'Not included'}</p>
+              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled && (inputs.treatAsForeignSource || inputs.foreignPropertyCountry === 'Spain') ? 'Included in worldwide income (foreign or domestic Spain)' : 'Not included'}</p>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -109,10 +70,13 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
               <p><strong>Tax year:</strong> {taxYears.spainBeckham}</p>
               <p><strong>Flat rate:</strong> {(spainBeckhamConfig[taxYears.spainBeckham].beckhamFlatRate! * 100)}% on employment income up to €{spainBeckhamConfig[taxYears.spainBeckham].beckhamThreshold?.toLocaleString()}</p>
               <p><strong>Above threshold:</strong> {(spainBeckhamConfig[taxYears.spainBeckham].beckhamUpperRate! * 100)}%</p>
+              <p><strong>UK property:</strong> Always foreign-source and exempt from Spanish tax. UK property is taxed in the UK (NRL).</p>
               <p><strong>Foreign income:</strong> Generally exempt from Spanish tax under this regime. Foreign-source property income is typically not taxed in Spain.</p>
+              <p><strong>Spanish rental:</strong> Treated as Spanish-source; deductions (mortgage interest, IBI, etc.) allowed per July 2025 ruling for non-EU residents.</p>
               <p><strong>No personal allowance or deductions</strong> — flat rate applied to gross employment income.</p>
               <p><strong>Social security:</strong> Same employee rates as normal regime.</p>
-              <p><strong>Eligibility:</strong> {inputs.beckhamEligible ? 'Assumed eligible and opted in' : 'Not eligible / not opted in'}</p>
+              <p><strong>Eligibility:</strong> Assumed eligible and opted in. Beckham Law applies to new Spanish residents in the first 6 years. Foreign income exceeding 15% of total may affect eligibility.</p>
+              <p><strong>Main residence imputed income:</strong> TEAC July 2024 — owner-occupied Spanish main residence may have imputed income (2% of cadastral value) taxable at 24%. Not included here (rental property only).</p>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -121,12 +85,19 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
           <AccordionTrigger className="text-sm">🇪🇸 Spain Autónomo (Freelancer)</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2 text-sm text-muted-foreground">
+              <p><strong>Region:</strong> Barcelona (Catalonia) assumed</p>
               <p><strong>Tax year:</strong> {taxYears.spainAutonomo}</p>
               <p><strong>Expense deduction rate:</strong> {inputs.expenseDeductionRate}% (flat, user-configurable)</p>
-              <p><strong>IRPF:</strong> Same progressive bands as normal regime, applied to net profit (gross minus expenses minus cuota).</p>
+              <p><strong>IRPF:</strong> Same Barcelona (Catalonia) bands as normal regime, applied to net profit (gross minus expenses minus cuota).</p>
               <p><strong>Personal minimum:</strong> €{spainAutonomoConfig[taxYears.spainAutonomo].personalMinimum?.toLocaleString()}</p>
               <p><strong>General deduction:</strong> €{spainAutonomoConfig[taxYears.spainAutonomo].generalDeduction?.toLocaleString()}</p>
-              <p><strong>Cuota de autónomo (2025):</strong> Progressive system based on net monthly income. No employer SS contributions.</p>
+              <p><strong>Cuota de autónomo:</strong></p>
+              <ul className="list-disc ml-4 space-y-0.5">
+                <li><strong>Year 1:</strong> €80/month (tarifa plana) — first 12 months</li>
+                <li><strong>Year 2:</strong> €80/month if net income below SMI (€{SMI_MONTHLY[taxYears.spainAutonomo]?.toLocaleString() ?? '1,184'}/mo), otherwise full tramo</li>
+                <li><strong>Year 3+:</strong> Progressive tramos based on net monthly income</li>
+              </ul>
+              <p><strong>Tramos (Year 3+):</strong></p>
               <ul className="list-disc ml-4 max-h-40 overflow-y-auto">
                 {spainAutonomoConfig[taxYears.spainAutonomo].autonomoTramos?.map((t, i) => (
                   <li key={i}>
@@ -134,7 +105,7 @@ export default function AssumptionsPanel({ inputs, taxYears, onTaxYearsChange }:
                   </li>
                 ))}
               </ul>
-              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled && inputs.spainResident && inputs.treatAsForeignSource ? 'Included in worldwide income' : 'Not included'}</p>
+              <p><strong>Foreign property income:</strong> {inputs.foreignPropertyEnabled && (inputs.treatAsForeignSource || inputs.foreignPropertyCountry === 'Spain') ? 'Included in worldwide income (foreign or domestic Spain)' : 'Not included'}</p>
             </div>
           </AccordionContent>
         </AccordionItem>

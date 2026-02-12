@@ -1,6 +1,23 @@
 import { TaxYearConfig } from '@/types/tax';
 
+// UK: England/Wales/NI (excl. Scotland). PA and bands frozen from 2023/24 through 2026/27.
 export const ukTaxConfig: Record<string, TaxYearConfig> = {
+  '2023/24': {
+    year: '2023/24',
+    personalAllowance: 12570,
+    personalAllowanceTaperStart: 100000,
+    bands: [
+      { from: 0, to: 37700, rate: 0.20 },
+      { from: 37700, to: 125140, rate: 0.40 },
+      { from: 125140, to: null, rate: 0.45 },
+    ],
+    niThresholds: {
+      primary: 12570,
+      upper: 50270,
+      primaryRate: 0.08,
+      upperRate: 0.02,
+    },
+  },
   '2024/25': {
     year: '2024/25',
     personalAllowance: 12570,
@@ -17,20 +34,126 @@ export const ukTaxConfig: Record<string, TaxYearConfig> = {
       upperRate: 0.02,
     },
   },
+  '2025/26': {
+    year: '2025/26',
+    personalAllowance: 12570,
+    personalAllowanceTaperStart: 100000,
+    bands: [
+      { from: 0, to: 37700, rate: 0.20 },
+      { from: 37700, to: 125140, rate: 0.40 },
+      { from: 125140, to: null, rate: 0.45 },
+    ],
+    niThresholds: {
+      primary: 12570,
+      upper: 50270,
+      primaryRate: 0.08,
+      upperRate: 0.02,
+    },
+  },
+  '2026/27': {
+    year: '2026/27',
+    personalAllowance: 12570,
+    personalAllowanceTaperStart: 100000,
+    bands: [
+      { from: 0, to: 37700, rate: 0.20 },
+      { from: 37700, to: 125140, rate: 0.40 },
+      { from: 125140, to: null, rate: 0.45 },
+    ],
+    niThresholds: {
+      primary: 12570,
+      upper: 50270,
+      primaryRate: 0.08,
+      upperRate: 0.02,
+    },
+  },
 };
 
+// Spain config assumes Barcelona (Catalonia) – combined state + regional rates. Sources: Agencia Tributaria, countryeconomy.com.
 export const spainNormalConfig: Record<string, TaxYearConfig> = {
+  '2023': {
+    year: '2023',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    socialSecurityRate: 0.0635,
+    socialSecurityCap: 56646,
+  },
   '2024': {
     year: '2024',
     personalMinimum: 5550,
     generalDeduction: 2000,
     bands: [
-      { from: 0, to: 12450, rate: 0.19 },
-      { from: 12450, to: 20200, rate: 0.24 },
-      { from: 20200, to: 35200, rate: 0.30 },
-      { from: 35200, to: 60000, rate: 0.37 },
-      { from: 60000, to: 300000, rate: 0.45 },
-      { from: 300000, to: null, rate: 0.47 },
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    socialSecurityRate: 0.0635,
+    socialSecurityCap: 56646,
+  },
+  '2025': {
+    year: '2025',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    socialSecurityRate: 0.0635,
+    socialSecurityCap: 56646,
+  },
+  '2026': {
+    year: '2026',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
     ],
     socialSecurityRate: 0.0635,
     socialSecurityCap: 56646,
@@ -38,6 +161,13 @@ export const spainNormalConfig: Record<string, TaxYearConfig> = {
 };
 
 export const spainBeckhamConfig: Record<string, TaxYearConfig> = {
+  '2023': {
+    year: '2023',
+    beckhamFlatRate: 0.24,
+    beckhamThreshold: 600000,
+    beckhamUpperRate: 0.47,
+    bands: [],
+  },
   '2024': {
     year: '2024',
     beckhamFlatRate: 0.24,
@@ -45,20 +175,153 @@ export const spainBeckhamConfig: Record<string, TaxYearConfig> = {
     beckhamUpperRate: 0.47,
     bands: [],
   },
+  '2025': {
+    year: '2025',
+    beckhamFlatRate: 0.24,
+    beckhamThreshold: 600000,
+    beckhamUpperRate: 0.47,
+    bands: [],
+  },
+  '2026': {
+    year: '2026',
+    beckhamFlatRate: 0.24,
+    beckhamThreshold: 600000,
+    beckhamUpperRate: 0.47,
+    bands: [],
+  },
 };
 
+// Spain Autónomo assumes Barcelona (Catalonia) – combined state + regional rates. Cuota tramos from RETA.
 export const spainAutonomoConfig: Record<string, TaxYearConfig> = {
+  '2023': {
+    year: '2023',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    autonomoTramos: [
+      { minMonthly: 0, maxMonthly: 670, cuota: 200 },
+      { minMonthly: 670, maxMonthly: 900, cuota: 220 },
+      { minMonthly: 900, maxMonthly: 1166.70, cuota: 260 },
+      { minMonthly: 1166.70, maxMonthly: 1300, cuota: 291 },
+      { minMonthly: 1300, maxMonthly: 1500, cuota: 294 },
+      { minMonthly: 1500, maxMonthly: 1700, cuota: 294 },
+      { minMonthly: 1700, maxMonthly: 1850, cuota: 310 },
+      { minMonthly: 1850, maxMonthly: 2030, cuota: 315 },
+      { minMonthly: 2030, maxMonthly: 2330, cuota: 320 },
+      { minMonthly: 2330, maxMonthly: 2760, cuota: 330 },
+      { minMonthly: 2760, maxMonthly: 3190, cuota: 350 },
+      { minMonthly: 3190, maxMonthly: 3620, cuota: 370 },
+      { minMonthly: 3620, maxMonthly: 4050, cuota: 390 },
+      { minMonthly: 4050, maxMonthly: 6000, cuota: 400 },
+      { minMonthly: 6000, maxMonthly: null, cuota: 590 },
+    ],
+  },
+  '2024': {
+    year: '2024',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    autonomoTramos: [
+      { minMonthly: 0, maxMonthly: 670, cuota: 200 },
+      { minMonthly: 670, maxMonthly: 900, cuota: 220 },
+      { minMonthly: 900, maxMonthly: 1166.70, cuota: 260 },
+      { minMonthly: 1166.70, maxMonthly: 1300, cuota: 291 },
+      { minMonthly: 1300, maxMonthly: 1500, cuota: 294 },
+      { minMonthly: 1500, maxMonthly: 1700, cuota: 294 },
+      { minMonthly: 1700, maxMonthly: 1850, cuota: 310 },
+      { minMonthly: 1850, maxMonthly: 2030, cuota: 315 },
+      { minMonthly: 2030, maxMonthly: 2330, cuota: 320 },
+      { minMonthly: 2330, maxMonthly: 2760, cuota: 330 },
+      { minMonthly: 2760, maxMonthly: 3190, cuota: 350 },
+      { minMonthly: 3190, maxMonthly: 3620, cuota: 370 },
+      { minMonthly: 3620, maxMonthly: 4050, cuota: 390 },
+      { minMonthly: 4050, maxMonthly: 6000, cuota: 400 },
+      { minMonthly: 6000, maxMonthly: null, cuota: 590 },
+    ],
+  },
   '2025': {
     year: '2025',
     personalMinimum: 5550,
     generalDeduction: 2000,
     bands: [
-      { from: 0, to: 12450, rate: 0.19 },
-      { from: 12450, to: 20200, rate: 0.24 },
-      { from: 20200, to: 35200, rate: 0.30 },
-      { from: 35200, to: 60000, rate: 0.37 },
-      { from: 60000, to: 300000, rate: 0.45 },
-      { from: 300000, to: null, rate: 0.47 },
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
+    ],
+    autonomoTramos: [
+      { minMonthly: 0, maxMonthly: 670, cuota: 200 },
+      { minMonthly: 670, maxMonthly: 900, cuota: 220 },
+      { minMonthly: 900, maxMonthly: 1166.70, cuota: 260 },
+      { minMonthly: 1166.70, maxMonthly: 1300, cuota: 291 },
+      { minMonthly: 1300, maxMonthly: 1500, cuota: 294 },
+      { minMonthly: 1500, maxMonthly: 1700, cuota: 294 },
+      { minMonthly: 1700, maxMonthly: 1850, cuota: 310 },
+      { minMonthly: 1850, maxMonthly: 2030, cuota: 315 },
+      { minMonthly: 2030, maxMonthly: 2330, cuota: 320 },
+      { minMonthly: 2330, maxMonthly: 2760, cuota: 330 },
+      { minMonthly: 2760, maxMonthly: 3190, cuota: 350 },
+      { minMonthly: 3190, maxMonthly: 3620, cuota: 370 },
+      { minMonthly: 3620, maxMonthly: 4050, cuota: 390 },
+      { minMonthly: 4050, maxMonthly: 6000, cuota: 400 },
+      { minMonthly: 6000, maxMonthly: null, cuota: 590 },
+    ],
+  },
+  '2026': {
+    year: '2026',
+    personalMinimum: 5550,
+    generalDeduction: 2000,
+    bands: [
+      { from: 0, to: 12450, rate: 0.20 },
+      { from: 12450, to: 17707, rate: 0.24 },
+      { from: 17707, to: 20200, rate: 0.26 },
+      { from: 20200, to: 21000, rate: 0.29 },
+      { from: 21000, to: 33007, rate: 0.30 },
+      { from: 33007, to: 35200, rate: 0.338 },
+      { from: 35200, to: 53407, rate: 0.373 },
+      { from: 53407, to: 60000, rate: 0.40 },
+      { from: 60000, to: 90000, rate: 0.44 },
+      { from: 90000, to: 120000, rate: 0.46 },
+      { from: 120000, to: 175000, rate: 0.47 },
+      { from: 175000, to: 300000, rate: 0.48 },
+      { from: 300000, to: null, rate: 0.50 },
     ],
     autonomoTramos: [
       { minMonthly: 0, maxMonthly: 670, cuota: 200 },
@@ -80,14 +343,42 @@ export const spainAutonomoConfig: Record<string, TaxYearConfig> = {
   },
 };
 
+// SMI (Salario Mínimo Interprofesional) monthly — for Autónomo Year 2 tarifa plana extension
+export const SMI_MONTHLY: Record<string, number> = {
+  '2023': 1080,
+  '2024': 1134,
+  '2025': 1184,
+  '2026': 1184,
+};
+
+// Global tax year: single year (calendar year) used across all scenarios
+export const availableTaxYears = ['2023', '2024', '2025', '2026'];
+export const defaultTaxYear = '2025';
+
+// Map global year to regime-specific config keys
+export function taxYearForRegime(globalYear: string): { uk: string; spainNormal: string; spainBeckham: string; spainAutonomo: string } {
+  const yearMap: Record<string, { uk: string; spain: string }> = {
+    '2023': { uk: '2023/24', spain: '2023' },
+    '2024': { uk: '2024/25', spain: '2024' },
+    '2025': { uk: '2025/26', spain: '2025' },
+    '2026': { uk: '2026/27', spain: '2026' },
+  };
+  const m = yearMap[globalYear] ?? yearMap['2025'];
+  return {
+    uk: m.uk,
+    spainNormal: m.spain,
+    spainBeckham: m.spain,
+    spainAutonomo: m.spain,
+  };
+}
+
 export const defaultTaxYears = {
-  uk: '2024/25',
+  uk: '2025/26',
   spainNormal: '2024',
   spainBeckham: '2024',
   spainAutonomo: '2025',
 };
 
 export const propertyCountries = [
-  'Portugal', 'Spain', 'France', 'Italy', 'Germany', 'Greece',
-  'Ireland', 'Netherlands', 'Belgium', 'USA', 'Other',
+  'UK', 'Portugal', 'Spain', 'Greece', 'Italy',
 ];

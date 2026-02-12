@@ -1,4 +1,5 @@
 import { TaxResult, Currency } from '@/types/tax';
+import { convert } from '@/lib/taxCalculators';
 import ResultCard from './ResultCard';
 
 interface ResultsPanelProps {
@@ -14,6 +15,17 @@ const accentColors: Record<string, string> = {
   spainAutonomo: 'border-t-teal-500',
 };
 
+function totalNetInBase(r: TaxResult, baseCurrency: Currency, exchangeRate: number): number {
+  const propertyNetAnnual = r.foreignPropertyNetCashFlow ?? r.foreignPropertyNetAnnual ?? 0;
+  const ukPropertyTaxInResult = r.ukPropertyTax ?? 0;
+  const ukPropertyTaxInResultCurrency =
+    r.grossCurrency === 'GBP'
+      ? ukPropertyTaxInResult
+      : convert(ukPropertyTaxInResult, 'GBP', r.grossCurrency, exchangeRate);
+  const totalNetAnnual = r.netAnnual + propertyNetAnnual - ukPropertyTaxInResultCurrency;
+  return convert(totalNetAnnual, r.grossCurrency, baseCurrency, exchangeRate);
+}
+
 export default function ResultsPanel({ results, baseCurrency, exchangeRate }: ResultsPanelProps) {
   if (results.length === 0) {
     return (
@@ -23,15 +35,26 @@ export default function ResultsPanel({ results, baseCurrency, exchangeRate }: Re
     );
   }
 
+  let bestIdx = 0;
+  let bestNet = -Infinity;
+  results.forEach((r, i) => {
+    const net = totalNetInBase(r, baseCurrency, exchangeRate);
+    if (net > bestNet) {
+      bestNet = net;
+      bestIdx = i;
+    }
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {results.map((r) => (
+      {results.map((r, i) => (
         <ResultCard
           key={r.regimeKey}
           result={r}
           baseCurrency={baseCurrency}
           exchangeRate={exchangeRate}
           accentClass={accentColors[r.regimeKey] || 'border-t-primary'}
+          isBest={i === bestIdx}
         />
       ))}
     </div>
