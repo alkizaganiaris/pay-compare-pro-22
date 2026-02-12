@@ -72,7 +72,6 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
             <Label className="text-sm">🇬🇧 UK Tax Resident</Label>
             <Switch checked={inputs.includeUkNi} onCheckedChange={(v) => update({ includeUkNi: v })} />
           </div>
-          <p className="text-xs text-muted-foreground -mt-1 ml-6">Include employee NI</p>
 
           <Separator />
 
