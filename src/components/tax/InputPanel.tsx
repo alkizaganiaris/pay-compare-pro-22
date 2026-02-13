@@ -250,7 +250,7 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
 
       {/* Foreign Property Income */}
       <Card>
-        <CardHeader className="pb-3 pt-3 flex flex-row items-center justify-between space-y-0">
+        <CardHeader className="pb-6 pt-6 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base flex items-center gap-2 m-0">
             <Home className="h-4 w-4 shrink-0" /> Foreign Property Income
           </CardTitle>
