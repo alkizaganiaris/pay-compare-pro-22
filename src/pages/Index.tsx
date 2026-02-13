@@ -10,7 +10,7 @@ import TaxDocumentsPanel from '@/components/tax/TaxDocumentsPanel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const defaultInputs: TaxInputs = {
-  baseCurrency: 'GBP',
+  baseCurrency: 'EUR',
   exchangeRate: 1.15,
   grossSalary: 65000,
   salaryCurrency: 'GBP',
@@ -18,6 +18,7 @@ const defaultInputs: TaxInputs = {
   freelanceRevenue: 73650,
   freelanceCurrency: 'GBP',
   expenseDeductionRate: 7,
+  freelancePensionContributionPercent: 0,
   includeUkNi: true,
   includeSpainNormal: true,
   includeSpainBeckham: true,

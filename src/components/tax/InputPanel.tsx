@@ -169,6 +169,19 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
             />
             <CurrencySelect value={inputs.freelanceCurrency} onChange={(v) => update({ freelanceCurrency: v })} />
           </div>
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              placeholder="0"
+              min={0}
+              max={100}
+              step={0.5}
+              value={inputs.freelancePensionContributionPercent ?? 0}
+              onChange={(e) => update({ freelancePensionContributionPercent: parseFloat(e.target.value) || 0 })}
+              className="w-20"
+            />
+            <Label className="text-xs shrink-0">Pension % (sacrifice)</Label>
+          </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs">Expense deduction rate</Label>
@@ -201,7 +214,7 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
               </Select>
             </div>
           )}
-          <p className="text-xs text-muted-foreground">Used for Spain Autónomo calculation</p>
+          <p className="text-xs text-muted-foreground">Used for Spain Autónomo. Pension reduces taxable base.</p>
         </CardContent>
       </Card>
 

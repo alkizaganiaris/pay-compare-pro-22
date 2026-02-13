@@ -385,6 +385,12 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
                       <span className="font-mono font-medium text-amber-600">−{fmtCurrency(toBase(result.expenseDeduction / 12, result.grossCurrency), baseCurrency)}</span>
                     </div>
                   )}
+                  {(result.pensionContribution ?? 0) > 0 && (
+                    <div className="flex justify-between py-1.5 border-b border-border/50">
+                      <span className="text-muted-foreground">Pension (sacrifice)</span>
+                      <span className="font-mono font-medium text-amber-600">−{fmtCurrency(toBase(result.pensionContribution! / 12, result.grossCurrency), baseCurrency)}</span>
+                    </div>
+                  )}
                   {result.netTaxableProfit !== undefined && result.netTaxableProfit > 0 && (
                     <div className="flex justify-between py-1.5 border-b border-border/50">
                       <span className="text-muted-foreground">Net profit</span>

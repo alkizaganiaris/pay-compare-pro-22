@@ -88,7 +88,8 @@ export default function AssumptionsPanel({ inputs, taxYear, taxYears }: Assumpti
               <p><strong>Region:</strong> Barcelona (Catalonia) assumed</p>
               <p><strong>Tax year:</strong> {taxYears.spainAutonomo}</p>
               <p><strong>Expense deduction rate:</strong> {inputs.expenseDeductionRate}% (flat, user-configurable)</p>
-              <p><strong>IRPF:</strong> Same Barcelona (Catalonia) bands as normal regime, applied to net profit (gross minus expenses minus cuota).</p>
+              <p><strong>Pension sacrifice:</strong> {(inputs.freelancePensionContributionPercent ?? 0) > 0 ? `${inputs.freelancePensionContributionPercent}% of gross (reduces taxable base)` : 'None'}</p>
+              <p><strong>IRPF:</strong> Same Barcelona (Catalonia) bands as normal regime, applied to net profit (gross minus expenses minus pension minus cuota).</p>
               <p><strong>Personal minimum:</strong> €{spainAutonomoConfig[taxYears.spainAutonomo].personalMinimum?.toLocaleString()}</p>
               <p><strong>General deduction:</strong> €{spainAutonomoConfig[taxYears.spainAutonomo].generalDeduction?.toLocaleString()}</p>
               <p><strong>Cuota de autónomo:</strong></p>

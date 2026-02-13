@@ -647,8 +647,18 @@ export function calculateSpainAutonomo(inputs: TaxInputs, taxYear: string): TaxR
 
   // Expense deduction
   const expenseDeduction = grossEUR * (inputs.expenseDeductionRate / 100);
-  const netProfit = grossEUR - expenseDeduction;
+  const netProfitBeforePension = grossEUR - expenseDeduction;
+
+  // Pension sacrifice (reduces taxable base for IRPF)
+  const pensionPct = inputs.freelancePensionContributionPercent ?? 0;
+  const pensionEUR = grossEUR * (pensionPct / 100);
+  const netProfit = Math.max(0, netProfitBeforePension - pensionEUR);
+
   steps.push({ label: `Flat expense deduction (${inputs.expenseDeductionRate}%)`, amount: expenseDeduction, section: 'employment' });
+  if (pensionEUR > 0) {
+    steps.push({ label: 'Net profit (before pension)', amount: netProfitBeforePension, section: 'employment' });
+    steps.push({ label: 'Pension (sacrifice)', amount: -pensionEUR, detail: `${pensionPct}% of gross`, section: 'employment' });
+  }
   steps.push({ label: 'Net taxable profit', amount: netProfit, section: 'employment' });
 
   // Cuota de autónomo — Year 1 (tarifa plana), Year 2 (extended if below SMI), Year 3+ (full tramos)
@@ -738,10 +748,10 @@ export function calculateSpainAutonomo(inputs: TaxInputs, taxYear: string): TaxR
     }
   }
 
-  const totalDeductions = incomeTax + cuotaAnnual + foreignTax;
+  const totalDeductions = pensionEUR + incomeTax + cuotaAnnual + foreignTax;
   const netAnnual = grossEUR - totalDeductions;
 
-  steps.push({ label: 'Total deductions (tax + cuota)', amount: totalDeductions, section: 'net' });
+  steps.push({ label: 'Total deductions (pension + tax + cuota)', amount: totalDeductions, section: 'net' });
   steps.push({ label: 'Net annual (EUR)', amount: netAnnual, section: 'net' });
 
   const taxByCountry: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }> = [
@@ -757,6 +767,7 @@ export function calculateSpainAutonomo(inputs: TaxInputs, taxYear: string): TaxR
     grossIncome: grossEUR,
     grossCurrency: 'EUR',
     expenseDeduction,
+    pensionContribution: pensionEUR > 0 ? pensionEUR : undefined,
     taxableIncome: taxableBase,
     incomeTax,
     socialContributions: cuotaAnnual,

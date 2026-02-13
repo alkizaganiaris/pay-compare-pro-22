@@ -9,6 +9,7 @@ export interface TaxInputs {
   freelanceRevenue: number;
   freelanceCurrency: Currency;
   expenseDeductionRate: number; // percentage, e.g. 7
+  freelancePensionContributionPercent: number; // pension sacrifice % of gross freelance revenue
   includeUkNi: boolean;
   includeSpainNormal: boolean;
   includeSpainBeckham: boolean;
