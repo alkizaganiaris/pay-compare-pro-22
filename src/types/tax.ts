@@ -71,8 +71,8 @@ export interface TaxResult {
   foreignPropertyNetCashFlow?: number; // net cash flow: rental - deductibles - mortgage payment (annual)
   ukPropertyTax?: number; // UK tax on UK property when Spain resident (annual, GBP)
   dtaCredit?: number; // Spain DTA credit for UK tax paid (annual, EUR) – reduces Spanish IRPF
-  /** Tax paid per country for display in Tax by country section */
-  taxByCountry?: Array<{ country: string; amount: number; currency: Currency }>;
+  /** Tax and social security paid per country for display */
+  taxByCountry?: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }>;
   warnings: string[];
   pensionContribution?: number; // annual salary sacrifice amount
   // Autónomo specific

@@ -114,7 +114,7 @@ export default function ComparisonTable({ results, baseCurrency, exchangeRate }:
     });
   }
 
-  // Tax by country summary — dynamic based on taxByCountry
+  // Tax and Social Security by country — dynamic based on taxByCountry
   const countryOrder = ['UK', 'Spain', 'Portugal', 'Greece', 'Italy'];
   const countriesInResults = new Set<string>();
   results.forEach((r) => r.taxByCountry?.forEach(({ country }) => countriesInResults.add(country)));
@@ -122,14 +122,28 @@ export default function ComparisonTable({ results, baseCurrency, exchangeRate }:
   if (orderedCountries.length > 0) {
     rows.push({ label: '', values: results.map(() => ''), separator: true });
     orderedCountries.forEach((country) => {
-      rows.push({
-        label: `Tax paid in ${country}`,
-        values: results.map((r) => {
-          const entry = r.taxByCountry?.find((t) => t.country === country);
-          return entry && entry.amount > 0 ? fmt(c(entry.amount, entry.currency), baseCurrency) : '—';
-        }),
-        bold: true,
-      });
+      const hasTax = results.some((r) => (r.taxByCountry?.find((t) => t.country === country)?.tax ?? 0) > 0);
+      const hasSS = results.some((r) => (r.taxByCountry?.find((t) => t.country === country)?.socialSecurity ?? 0) > 0);
+      if (hasTax) {
+        rows.push({
+          label: `Tax paid in ${country}`,
+          values: results.map((r) => {
+            const entry = r.taxByCountry?.find((t) => t.country === country);
+            return entry && entry.tax > 0 ? fmt(c(entry.tax, entry.currency), baseCurrency) : '—';
+          }),
+          bold: true,
+        });
+      }
+      if (hasSS) {
+        rows.push({
+          label: country === 'UK' ? `National Insurance in ${country}` : `Social Security in ${country}`,
+          values: results.map((r) => {
+            const entry = r.taxByCountry?.find((t) => t.country === country);
+            return entry && entry.socialSecurity > 0 ? fmt(c(entry.socialSecurity, entry.currency), baseCurrency) : '—';
+          }),
+          bold: true,
+        });
+      }
     });
   }
 

@@ -315,11 +315,11 @@ export function calculateUK(inputs: TaxInputs, taxYear: string): TaxResult {
   steps.push({ label: 'Net annual (GBP)', amount: netAnnual, section: 'net' });
 
   // Tax by country: UK (always) + property country when Portugal/Greece/Italy
-  const taxByCountry: Array<{ country: string; amount: number; currency: Currency }> = [
-    { country: 'UK', amount: incomeTax + ni + foreignTax, currency: 'GBP' },
+  const taxByCountry: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }> = [
+    { country: 'UK', tax: incomeTax + foreignTax, socialSecurity: ni, currency: 'GBP' },
   ];
   const propCountryTax = computePropertyCountryTax(inputs);
-  if (propCountryTax) taxByCountry.push(propCountryTax);
+  if (propCountryTax) taxByCountry.push({ country: propCountryTax.country, tax: propCountryTax.amount, socialSecurity: 0, currency: propCountryTax.currency });
 
   return {
     regime: 'UK Tax Resident',
@@ -448,12 +448,12 @@ export function calculateSpainNormal(inputs: TaxInputs, taxYear: string): TaxRes
   steps.push({ label: 'Total deductions', amount: totalDeductions, section: 'net', order: 10 });
   steps.push({ label: 'Net annual (EUR)', amount: netAnnual, section: 'net', order: 11 });
 
-  const taxByCountry: Array<{ country: string; amount: number; currency: Currency }> = [
-    { country: 'Spain', amount: spanishTaxAfterDta + ss, currency: 'EUR' },
+  const taxByCountry: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }> = [
+    { country: 'Spain', tax: spanishTaxAfterDta, socialSecurity: ss, currency: 'EUR' },
   ];
-  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', amount: ukPropertyTax!, currency: 'GBP' });
+  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', tax: ukPropertyTax!, socialSecurity: 0, currency: 'GBP' });
   const propCountryTax = computePropertyCountryTax(inputs);
-  if (propCountryTax) taxByCountry.push(propCountryTax);
+  if (propCountryTax) taxByCountry.push({ country: propCountryTax.country, tax: propCountryTax.amount, socialSecurity: 0, currency: propCountryTax.currency });
 
   return {
     regime: 'Spanish Tax Resident - Normal',
@@ -577,12 +577,12 @@ export function calculateSpainBeckham(inputs: TaxInputs, taxYear: string): TaxRe
   steps.push({ label: 'Total deductions', amount: totalDeductions, section: 'net' });
   steps.push({ label: 'Net annual (EUR)', amount: netAnnual, section: 'net' });
 
-  const taxByCountry: Array<{ country: string; amount: number; currency: Currency }> = [
-    { country: 'Spain', amount: incomeTax + ss + foreignTax, currency: 'EUR' },
+  const taxByCountry: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }> = [
+    { country: 'Spain', tax: incomeTax + foreignTax, socialSecurity: ss, currency: 'EUR' },
   ];
-  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', amount: ukPropertyTax!, currency: 'GBP' });
+  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', tax: ukPropertyTax!, socialSecurity: 0, currency: 'GBP' });
   const propCountryTax = computePropertyCountryTax(inputs);
-  if (propCountryTax) taxByCountry.push(propCountryTax);
+  if (propCountryTax) taxByCountry.push({ country: propCountryTax.country, tax: propCountryTax.amount, socialSecurity: 0, currency: propCountryTax.currency });
 
   return {
     regime: 'Spanish Tax Resident - Beckham',
@@ -744,12 +744,12 @@ export function calculateSpainAutonomo(inputs: TaxInputs, taxYear: string): TaxR
   steps.push({ label: 'Total deductions (tax + cuota)', amount: totalDeductions, section: 'net' });
   steps.push({ label: 'Net annual (EUR)', amount: netAnnual, section: 'net' });
 
-  const taxByCountry: Array<{ country: string; amount: number; currency: Currency }> = [
-    { country: 'Spain', amount: incomeTax + cuotaAnnual + foreignTax, currency: 'EUR' },
+  const taxByCountry: Array<{ country: string; tax: number; socialSecurity: number; currency: Currency }> = [
+    { country: 'Spain', tax: incomeTax + foreignTax, socialSecurity: cuotaAnnual, currency: 'EUR' },
   ];
-  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', amount: ukPropertyTax!, currency: 'GBP' });
+  if ((ukPropertyTax ?? 0) > 0) taxByCountry.push({ country: 'UK', tax: ukPropertyTax!, socialSecurity: 0, currency: 'GBP' });
   const propCountryTax = computePropertyCountryTax(inputs);
-  if (propCountryTax) taxByCountry.push(propCountryTax);
+  if (propCountryTax) taxByCountry.push({ country: propCountryTax.country, tax: propCountryTax.amount, socialSecurity: 0, currency: propCountryTax.currency });
 
   return {
     regime: 'Spanish Tax Resident - Autónomo',

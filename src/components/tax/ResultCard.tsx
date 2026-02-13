@@ -10,7 +10,8 @@ function stepValueClass(step: CalculationStep): string {
   const l = step.label.toLowerCase();
   if (l.includes('credit') || l.includes('net annual')) return 'text-emerald-600';
   if (l.includes('allowance') || l.includes('general deduction') || l.includes('irpf (gross)')) return 'text-muted-foreground';
-  const isMoneyOut = (l.includes('tax') && !l.includes('taxable')) || l.includes('net irpf') || l.includes('national insurance') || l.includes('social security') || l.includes('cuota') || l.includes('total deduction') || l.includes('expense deduction');
+  if (l.includes('national insurance') || l.includes('social security') || l.includes('employee national') || l.includes('employee social') || l.includes('cuota')) return 'text-amber-600';
+  const isMoneyOut = (l.includes('tax') && !l.includes('taxable')) || l.includes('net irpf') || l.includes('total deduction') || l.includes('expense deduction');
   if (isMoneyOut) return 'text-rose-600';
   if (step.amount < 0) return 'text-rose-600';
   if (step.amount > 0 && (l.includes('gross') || l.includes('income') || l.includes('taxable') || l.includes('profit') || l.includes('base') || l.includes('property (nrl)'))) return 'text-emerald-600';
@@ -58,7 +59,7 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
   const totalNetMonthly = netMonthlyBase;
 
   return (
-    <Card className={`border-t-4 ${accentClass} ${isBest ? 'ring-2 ring-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-950/20' : ''}`}>
+    <Card className={`border-t-4 flex flex-col h-full ${accentClass} ${isBest ? 'ring-2 ring-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-950/20' : ''}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           {result.regime}
@@ -67,8 +68,8 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <Tabs defaultValue="summary" className="w-full">
+      <CardContent className="flex flex-col flex-1 min-h-0 overflow-hidden pt-0">
+        <Tabs defaultValue="summary" className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <TabsList className="w-full h-9 p-1 rounded-lg bg-muted/70 flex [&>button:first-child]:rounded-l-md [&>button:first-child]:rounded-r-none [&>button:last-child]:rounded-r-md [&>button:last-child]:rounded-l-none">
             <TabsTrigger
               value="summary"
@@ -85,7 +86,9 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
               Monthly
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="summary" className="mt-3 space-y-3">
+          <TabsContent value="summary" className="mt-3 flex flex-col flex-1 min-h-0 data-[state=inactive]:hidden">
+        <div className="grid grid-rows-[1fr_auto] min-h-0 flex-1 overflow-hidden">
+        <div className="space-y-3 min-h-0 overflow-auto pr-1">
         <div className="grid grid-cols-2 gap-2">
           <div>
             <p className="text-xs text-muted-foreground">Gross Annual</p>
@@ -104,23 +107,6 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
           </div>
         </div>
         <p className="text-xs text-muted-foreground">Gross − Total Deductions = Net</p>
-
-        {/* Tax by country — dynamic based on scenario and property location */}
-        {(result.taxByCountry && result.taxByCountry.length > 0) && (
-          <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tax by country</p>
-            {result.taxByCountry
-              .filter(({ amount }) => amount > 0)
-              .map(({ country, amount, currency }) => (
-                <div key={country} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tax paid in {country}</span>
-                  <span className="font-mono font-medium">
-                    {fmtCurrency(convert(amount, currency, baseCurrency, exchangeRate), baseCurrency)}
-                  </span>
-                </div>
-              ))}
-          </div>
-        )}
 
         <div className="grid grid-cols-2 gap-2 text-sm">
           {(result.pensionContribution ?? 0) > 0 && (
@@ -149,11 +135,11 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
           )}
           {result.taxByCountry
             ?.filter(({ country }) => ['Portugal', 'Greece', 'Italy'].includes(country))
-            .filter(({ amount }) => amount > 0)
-            .map(({ country, amount, currency }) => (
+            .filter(({ tax }) => tax > 0)
+            .map(({ country, tax, currency }) => (
               <div key={country}>
                 <p className="text-xs text-muted-foreground">{country} property tax (source country)</p>
-                <p className="font-medium">{fmtCurrency(convert(amount, currency, baseCurrency, exchangeRate), baseCurrency)}</p>
+                <p className="font-medium">{fmtCurrency(convert(tax, currency, baseCurrency, exchangeRate), baseCurrency)}</p>
               </div>
             ))}
           {result.regimeKey === 'spainNormal' && ukPropertyTaxInResult > 0 && (
@@ -216,32 +202,126 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
             ))}
           </div>
         )}
+        </div>
+
+        <div className="pt-3 space-y-3 border-t border-border/50 shrink-0">
+        {/* Tax and Social Security by country */}
+        {(result.taxByCountry && result.taxByCountry.length > 0) && (
+          <div className="rounded-md border border-border bg-muted/30 p-3 space-y-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tax / Social Security by country</p>
+              <div className="space-y-1.5">
+                {result.taxByCountry
+                  .filter(({ tax }) => tax > 0)
+                  .map(({ country, tax, currency }) => (
+                    <div key={`${country}-tax`} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{country} – Tax</span>
+                      <span className="font-mono font-medium text-rose-600">
+                        {fmtCurrency(convert(tax, currency, baseCurrency, exchangeRate), baseCurrency)}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div>
+              <div className="space-y-1.5">
+                {result.taxByCountry
+                  .filter(({ socialSecurity }) => socialSecurity > 0)
+                  .map(({ country, socialSecurity, currency }) => (
+                    <div key={`${country}-ss`} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{country} – {country === 'UK' ? 'National Insurance' : 'Social Security'}</span>
+                      <span className="font-mono font-medium text-amber-600">
+                        {fmtCurrency(convert(socialSecurity, currency, baseCurrency, exchangeRate), baseCurrency)}
+                      </span>
+                    </div>
+                  ))}
+                {!result.taxByCountry.some((t) => t.socialSecurity > 0) && (
+                  <p className="text-xs text-muted-foreground">—</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Breakdown */}
         <Collapsible open={open} onOpenChange={setOpen}>
-          <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors w-full">
+          <CollapsibleTrigger className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors w-full">
             <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
             How is this calculated?
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="mt-2 space-y-3 text-xs">
+            <div className="mt-2 space-y-3">
               {(['employment', 'property', 'net'] as const).map((section) => {
                 const sectionSteps = result.steps
                   .filter((s) => s.section === section)
                   .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
                 if (sectionSteps.length === 0) return null;
                 const sectionTitles = { employment: 'From employment', property: 'From property', net: 'Net' };
+
+                if (section === 'net') {
+                  const pensionAmt = result.pensionContribution ?? 0;
+                  const socialAmt = result.socialContributions ?? 0;
+                  const taxAmt = result.regimeKey === 'spainNormal'
+                    ? result.incomeTax - (result.dtaCredit ?? 0)
+                    : (result.incomeTax ?? 0) + (result.foreignIncomeTax ?? 0);
+                  const netStep = sectionSteps.find((s) => s.label.toLowerCase().includes('net annual'));
+                  const netFormatted = netStep
+                    ? fmtCurrency(convert(Math.abs(netStep.amount), result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)
+                    : '';
+                  return (
+                    <div key={section} className="rounded-md border border-border bg-muted/30 p-3">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{sectionTitles[section]}</p>
+                      <div className="space-y-0.5 text-xs">
+                        {pensionAmt > 0 && (
+                          <div className="flex justify-between py-0.5 border-b border-border/50">
+                            <span className="text-muted-foreground">Pension</span>
+                            <span className="font-mono text-muted-foreground">
+                              {fmtCurrency(convert(pensionAmt, result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}
+                            </span>
+                          </div>
+                        )}
+                        {socialAmt > 0 && (
+                          <div className="flex justify-between py-0.5 border-b border-border/50">
+                            <span className="text-muted-foreground">
+                              {result.regimeKey === 'spainAutonomo' ? 'Social security (cuota)' : result.regimeKey === 'uk' ? 'National Insurance' : 'Social security'}
+                            </span>
+                            <span className="font-mono font-medium text-amber-600">
+                              {fmtCurrency(convert(socialAmt, result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}
+                            </span>
+                          </div>
+                        )}
+                        {taxAmt > 0 && (
+                          <div className="flex justify-between py-0.5 border-b border-border/50">
+                            <span className="text-muted-foreground">Tax</span>
+                            <span className="font-mono font-medium text-rose-600">
+                              {fmtCurrency(convert(taxAmt, result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}
+                            </span>
+                          </div>
+                        )}
+                        {netStep && (
+                          <div className="flex justify-between py-0.5 border-b border-border/50 last:border-0">
+                            <span className="text-muted-foreground">{netStep.label}</span>
+                            <span className="font-mono font-medium text-emerald-600">{netFormatted}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
-                  <div key={section}>
-                    <p className="font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">{sectionTitles[section]}</p>
-                    <div className="space-y-0.5">
+                  <div key={section} className="rounded-md border border-border bg-muted/30 p-3">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{sectionTitles[section]}</p>
+                    <div className="space-y-0.5 text-xs">
                       {sectionSteps.map((step, i) => {
                         const valueClass = stepValueClass(step);
+                        const isPension = step.label.toLowerCase().includes('pension') && step.label.toLowerCase().includes('sacrifice');
+                        const formattedAmount = fmtCurrency(convert(Math.abs(step.amount), result.grossCurrency, baseCurrency, exchangeRate), baseCurrency);
                         return (
                           <div key={i} className="flex justify-between py-0.5 border-b border-border/50 last:border-0">
                             <span className="text-muted-foreground">{step.label}</span>
-                            <span className={`font-mono font-medium ${valueClass}`}>
-                              {step.amount < 0 ? '-' : ''}{fmtCurrency(convert(Math.abs(step.amount), result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}
+                            <span className={isPension ? 'font-mono text-muted-foreground' : `font-mono font-medium ${valueClass}`}>
+                              {isPension ? formattedAmount : `${step.amount < 0 ? '-' : ''}${formattedAmount}`}
                             </span>
                           </div>
                         );
@@ -252,34 +332,43 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
               })}
               {/* Steps without section (legacy / fallback) */}
               {result.steps.filter((s) => !s.section).length > 0 && (
-                <div>
+                <div className="rounded-md border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Other</p>
+                  <div className="space-y-0.5 text-xs">
                   {result.steps.filter((s) => !s.section).map((step, i) => {
                     const valueClass = stepValueClass(step);
+                    const isPension = step.label.toLowerCase().includes('pension') && step.label.toLowerCase().includes('sacrifice');
+                    const formattedAmount = fmtCurrency(convert(Math.abs(step.amount), result.grossCurrency, baseCurrency, exchangeRate), baseCurrency);
                     return (
                       <div key={i} className="flex justify-between py-0.5 border-b border-border/50 last:border-0">
                         <span className="text-muted-foreground">{step.label}</span>
-                        <span className={`font-mono font-medium ${valueClass}`}>
-                          {step.amount < 0 ? '-' : ''}{fmtCurrency(convert(Math.abs(step.amount), result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}
+                        <span className={isPension ? 'font-mono text-muted-foreground' : `font-mono font-medium ${valueClass}`}>
+                          {isPension ? formattedAmount : `${step.amount < 0 ? '-' : ''}${formattedAmount}`}
                         </span>
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               )}
               {result.bandBreakdown.length > 0 && (
-                <div className="pt-2 border-t border-border">
-                  <p className="font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">Tax bands</p>
+                <div className="rounded-md border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tax bands</p>
+                  <div className="space-y-0.5 text-xs">
                   {result.bandBreakdown.map((b, i) => (
                     <div key={i} className="flex justify-between py-0.5 text-muted-foreground">
                       <span>{b.band} @ {(b.rate * 100).toFixed(0)}%</span>
                       <span className="font-mono text-rose-600 font-medium">{fmtCurrency(convert(b.tax, result.grossCurrency, baseCurrency, exchangeRate), baseCurrency)}</span>
                     </div>
                   ))}
+                  </div>
                 </div>
               )}
             </div>
           </CollapsibleContent>
         </Collapsible>
+        </div>
+        </div>
           </TabsContent>
           <TabsContent value="monthly" className="mt-3">
             <div className="rounded-md border bg-muted/30 p-3 space-y-2 text-sm">
@@ -365,7 +454,7 @@ export default function ResultCard({ result, baseCurrency, exchangeRate, accentC
                     <span className="font-mono font-medium text-red-600">−{fmtCurrency(incomeTaxMonthly, baseCurrency)}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-border/50">
-                    <span className="text-muted-foreground">NI / Social security</span>
+                    <span className="text-muted-foreground">{result.regimeKey === 'uk' ? 'National Insurance' : 'Social security'}</span>
                     <span className="font-mono font-medium text-red-600">−{fmtCurrency(socialMonthly, baseCurrency)}</span>
                   </div>
                   <div className="flex justify-between py-2 pt-3 font-semibold">

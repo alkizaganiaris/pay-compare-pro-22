@@ -46,7 +46,7 @@ export default function ResultsPanel({ results, baseCurrency, exchangeRate }: Re
   });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
       {results.map((r, i) => (
         <ResultCard
           key={r.regimeKey}
