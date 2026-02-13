@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { TaxInputs, Currency } from '@/types/tax';
 import { propertyCountries, availableTaxYears } from '@/data/taxConfig';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { RotateCcw, Building2, Briefcase, Home } from 'lucide-react';
+import { RotateCcw, Building2, Briefcase, Home, Download, Upload } from 'lucide-react';
+import { serializeConfig, deserializeConfig, downloadConfig, parseTaxInputs } from '@/lib/configExport';
 
 interface InputPanelProps {
   inputs: TaxInputs;
@@ -34,6 +36,34 @@ function CurrencySelect({ value, onChange }: { value: Currency; onChange: (v: Cu
 
 export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYearChange }: InputPanelProps) {
   const update = (partial: Partial<TaxInputs>) => onChange({ ...inputs, ...partial });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSaveConfig = () => {
+    try {
+      const content = serializeConfig({ inputs, taxYear });
+      downloadConfig(content);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Failed to save config.');
+    }
+  };
+
+  const handleLoadConfig = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    try {
+      const text = await file.text();
+      const config = deserializeConfig(text);
+      const validated = parseTaxInputs(config.inputs);
+      if (!validated) {
+        throw new Error('Config file is corrupted or from an older version.');
+      }
+      onChange(validated);
+      onTaxYearChange(config.taxYear);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Failed to load config. Invalid file.');
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -220,16 +250,15 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
 
       {/* Foreign Property Income */}
       <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Home className="h-4 w-4" /> Foreign Property Income
-            </CardTitle>
-            <Switch
-              checked={inputs.foreignPropertyEnabled}
-              onCheckedChange={(v) => update({ foreignPropertyEnabled: v })}
-            />
-          </div>
+        <CardHeader className="pb-3 pt-3 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base flex items-center gap-2 m-0">
+            <Home className="h-4 w-4 shrink-0" /> Foreign Property Income
+          </CardTitle>
+          <Switch
+            checked={inputs.foreignPropertyEnabled}
+            onCheckedChange={(v) => update({ foreignPropertyEnabled: v })}
+            className="shrink-0"
+          />
         </CardHeader>
         {inputs.foreignPropertyEnabled && (
           <CardContent className="space-y-3">
@@ -341,6 +370,27 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
         )}
       </Card>
 
+      <div className="flex gap-2">
+        <Button variant="outline" className="flex-1" onClick={handleSaveConfig}>
+          <Download className="h-4 w-4 mr-2" />
+          Save Config
+        </Button>
+        <Button
+          variant="outline"
+          className="flex-1"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          Load Config
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".txt"
+          className="hidden"
+          onChange={handleLoadConfig}
+        />
+      </div>
       <Button variant="outline" className="w-full" onClick={onReset}>
         <RotateCcw className="h-4 w-4 mr-2" />
         Reset to defaults
