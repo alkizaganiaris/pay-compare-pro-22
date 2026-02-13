@@ -88,7 +88,6 @@ export default function InputPanel({ inputs, onChange, onReset, taxYear, onTaxYe
               </SelectContent>
             </Select>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Applied across all scenarios</p>
         </CardContent>
       </Card>
 

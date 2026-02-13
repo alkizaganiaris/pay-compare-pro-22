@@ -456,7 +456,7 @@ export function calculateSpainNormal(inputs: TaxInputs, taxYear: string): TaxRes
   if (propCountryTax) taxByCountry.push({ country: propCountryTax.country, tax: propCountryTax.amount, socialSecurity: 0, currency: propCountryTax.currency });
 
   return {
-    regime: 'Spanish Tax Resident - Normal',
+    regime: 'Spanish Tax Resident - IRPF',
     regimeKey: 'spainNormal',
     pensionContribution: pensionEUR,
     foreignPropertyNetAnnual,
