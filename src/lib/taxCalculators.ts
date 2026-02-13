@@ -416,12 +416,12 @@ export function calculateSpainNormal(inputs: TaxInputs, taxYear: string): TaxRes
     steps.push({ label: 'Property income (to general base)', amount: propEUR, section: 'property', order: 1 });
     steps.push({ label: 'Combined taxable base', amount: combinedBase, section: 'property', order: 2 });
     steps.push({ label: 'IRPF (gross)', amount: totalGrossTax, section: 'property', order: 3 });
-    steps.push({ label: 'Personal minimum tax credit', amount: -minTaxCombined, detail: `Tax on €${fmt(personalMin)} personal minimum`, section: 'property', order: 4 });
+    steps.push({ label: 'Personal allowance (credit)', amount: -minTaxCombined, detail: `Tax relief on €${fmt(personalMin)} (mínimo personal)`, section: 'property', order: 4 });
     steps.push({ label: 'Net IRPF', amount: incomeTax, section: 'property', order: 5 });
     steps.push({ label: 'Property tax (marginal rate)', amount: foreignTax, detail: 'Property taxed at general progressive rates (Spain: mortgage interest deductible)', section: 'property', order: 6 });
   } else {
     steps.push({ label: 'IRPF (gross)', amount: grossTax, section: 'employment', order: 7 });
-    steps.push({ label: 'Personal minimum tax credit', amount: -minTax, detail: `Tax on €${fmt(personalMin)} personal minimum`, section: 'employment', order: 8 });
+    steps.push({ label: 'Personal allowance (credit)', amount: -minTax, detail: `Tax relief on €${fmt(personalMin)} (mínimo personal)`, section: 'employment', order: 8 });
     steps.push({ label: 'Net IRPF', amount: incomeTax, section: 'employment', order: 9 });
   }
 
@@ -730,12 +730,12 @@ export function calculateSpainAutonomo(inputs: TaxInputs, taxYear: string): TaxR
     steps.push({ label: 'Property income (to general base)', amount: propEUR, section: 'property' });
     steps.push({ label: 'Combined taxable base', amount: combinedBase, section: 'property' });
     steps.push({ label: 'IRPF (gross)', amount: totalGrossTax, section: 'property' });
-    steps.push({ label: 'Personal minimum tax credit', amount: -minTaxCombined, section: 'property' });
+    steps.push({ label: 'Personal allowance (credit)', amount: -minTaxCombined, detail: `Tax relief on €${fmt(personalMin)} (mínimo personal)`, section: 'property' });
     steps.push({ label: 'Net IRPF', amount: incomeTax, section: 'property' });
     steps.push({ label: 'Property tax (marginal rate)', amount: foreignTax, detail: 'Spain: mortgage interest deductible', section: 'property' });
   } else {
     steps.push({ label: 'IRPF (gross)', amount: grossTax, section: 'employment' });
-    steps.push({ label: 'Personal minimum tax credit', amount: -minTax, section: 'employment' });
+    steps.push({ label: 'Personal allowance (credit)', amount: -minTax, detail: `Tax relief on €${fmt(personalMin)} (mínimo personal)`, section: 'employment' });
     steps.push({ label: 'Net IRPF', amount: incomeTax, section: 'employment' });
   }
 
